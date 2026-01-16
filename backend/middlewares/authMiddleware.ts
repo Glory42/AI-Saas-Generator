@@ -10,7 +10,7 @@ export default function authtoken(req: Request, res: Response, next: NextFunctio
 
     const token = header.split(' ')[1];
     if (!token) {
-        return res.status(401).json({ message: 'Token is missind' });
+        return res.status(401).json({ message: 'Token is missing' });
     }
 
     try {
