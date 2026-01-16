@@ -9,9 +9,16 @@ export const uploadImage = asyncHandler(async (req: Request, res: Response): Pro
         throw new apiError(400, 'No image file provided');
     }
 
-    const imageUrl = await StorageService.uploadFile(req.file);
+    if (!req.user || !req.user.email) {
+        throw new apiError(401, "User not identified");
+    }
 
-    const newImage = await ImageModel.create(imageUrl);
+    const safeName = req.user.email.replace(/[^a-zA-Z0-9]/g, "_");
+    const userFolder = `ai-saas-app/${safeName}`;
+
+    const imageUrl = await StorageService.uploadFile(req.file, userFolder);
+
+    const newImage = await ImageModel.create(imageUrl, req.user.id);
     
     res.status(201).json({
         success: true,
