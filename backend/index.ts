@@ -1,7 +1,9 @@
 import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 import config from './config/config.ts';
+import userRoutes from './routes/userRoute';
 import uploadRoutes from './routes/uploadRoute.ts';
+import generateRoutes from "./routes/generateRoute";
 import errorHandler from './middlewares/errorHandler.ts';
 import notFoundHandler from './middlewares/404handler.ts';
 
@@ -24,7 +26,9 @@ app.get('/', (req: Request, res: Response) => {
     });
 });
 
+app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/generate', generateRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
