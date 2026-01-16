@@ -12,13 +12,17 @@
     "@types/bun": "latest",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/multer": "^2.0.0",
     "@types/node": "^25.0.9"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "cloudinary": "^2.8.0",
+    "convex": "^1.31.5",
     "cors": "^2.8.5",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "multer": "^2.0.2"
   }
 }
