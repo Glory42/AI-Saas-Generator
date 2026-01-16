@@ -1,5 +1,5 @@
 import { type Request, type Response, type NextFunction } from 'express';
-import { apiError } from '../utils/apiError.js';
+import { apiError } from '../utils/apiError';
 
 export default function errorHandler(
     err: Error | apiError, 
@@ -18,6 +18,7 @@ export default function errorHandler(
         });
 
         res.status(statusCode).json({
+            success: false,
             error: message,
             ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
         });
