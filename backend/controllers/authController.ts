@@ -12,7 +12,7 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
         throw new apiError(400, 'Email and Password are required');
     }
 
-    const freshUser = await User.creatUser({ email, password, username, role: 'user' });
+    const freshUser = await User.createUser({ email, password, username, role: 'user' });
     if (!freshUser || !freshUser.id) {
         console.error('Invalid user data returned: ', { freshUser });
         throw new apiError(401, 'Invalid user data returned');

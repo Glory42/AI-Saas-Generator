@@ -9,7 +9,7 @@ import {
 import { validateUser } from '../utils/validator';
 
 export default class User {
-    static async creatUser({ email, password, username, role = 'user' }:CreateUserDTO ): Promise<UserDTO> {
+    static async createUser({ email, password, username, role = 'user' }:CreateUserDTO ): Promise<UserDTO> {
         try {
             validateUser({ email, password, username });
 
@@ -17,13 +17,13 @@ export default class User {
                 throw new Error('Invalid role');
             }
 
-            const harsedPassword = await bcrypt.hash(password, 10);
+            const hashedPassword = await bcrypt.hash(password, 10);
             
             const { data, error } = await supabase
                 .from('users')
                 .insert({
                     email,
-                    password: harsedPassword,
+                    password: hashedPassword,
                     username,
                     role,
                     created_at: new Date().toISOString(),
