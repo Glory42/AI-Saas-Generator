@@ -1,4 +1,3 @@
-ai-saas-generator
 # AI SaaS Image Generator
 
 > A full-stack AI platform that transforms ordinary product photos into professional marketing assets using a Smart Hybrid AI Engine.
