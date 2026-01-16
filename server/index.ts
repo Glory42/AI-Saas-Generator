@@ -1,6 +1,9 @@
 import express, { type Request, type Response } from 'express';
 import cors from 'cors';
 
+import config from './config/config.ts';
+import uploadRoutes from './routes/uploadRoute.ts';
+
 const app = express();
 
 app.use(cors());
@@ -14,7 +17,8 @@ app.get('/', (req: Request, res: Response) => {
     });
 });
 
-const PORT = process.env.PORT
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+app.post('/api/upload', uploadRoutes);
+
+app.listen(config.port, () => {
+    console.log(`Server is running on http://localhost:${config.port}`);
 });
