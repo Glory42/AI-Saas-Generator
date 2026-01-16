@@ -20,7 +20,7 @@ function App() {
 
     try {
       // CHANGE THIS URL TO YOUR LOCALHOST OR PRODUCTION URL
-      const response = await fetch("http://localhost:5000/api/upload", {
+      const response = await fetch("https://ai-saas-generator.onrender.com/api/upload", {
         method: "POST",
         body: formData,
       });
