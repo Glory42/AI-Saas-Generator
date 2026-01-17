@@ -35,19 +35,15 @@ export default class User {
                 .single()
                     
             if(error) {
+                // Handle specific error codes
+                if (error.code === '23505') { // Unique violation - email already exists
+                    throw new Error('Email already exists');
+                }
                 throw error;
             }
 
-            if(!data || data.length === 0) {
-                const { data: manualData, error: manualError } = await supabase
-                    .from('users')
-                    .select('*')
-                    .eq('email', email)
-                    .single();
-                if (manualError) {
-                    throw manualError;
-                }
-                return manualData;
+            if(!data) {
+                throw new Error('Failed to create user: No data returned');
             }
 
             return data;
@@ -162,15 +158,36 @@ export default class User {
 
     static async updateUser(id: string, updates: UpdateUserDTO): Promise<UserDTO> {
         try {
+            // Explicit type-safe filtering
+            const { email, username, password, role } = updates;
+            
+            const sanitizedUpdates: Partial<UpdateUserDTO> = {};
+            const timestampUpdates: Record<string, string> = {};
+            
+            // Handle each field explicitly with type safety
+            if (email !== undefined) {
+                sanitizedUpdates.email = email;
+                timestampUpdates.email_updated_at = new Date().toISOString();
+            }
+            
+            if (username !== undefined) {
+                sanitizedUpdates.username = username;
+                timestampUpdates.username_updated_at = new Date().toISOString();
+            }
+            
+            if (password !== undefined) {
+                sanitizedUpdates.password = password;
+                timestampUpdates.password_updated_at = new Date().toISOString();
+            }
+            
+            // Role handling with type safety - only allow role updates with explicit validation
+            if (role !== undefined && (role === 'user' || role === 'admin')) {
+                sanitizedUpdates.role = role;  // Type-safe assignment
+            }
+            
             const { data, error } = await supabase
                 .from('users')
-                .update({
-                    ...updates,
-                    email_updated_at: new Date().toISOString(),
-                    password_updated_at: new Date().toISOString(),
-                    username_updated_at: new Date().toISOString(),
-                    phone_updated_at: new Date().toISOString(),
-                })
+                .update({ ...sanitizedUpdates, ...timestampUpdates })
                 .eq('id', id)
                 .select();
             

@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import Button from './ui/Button';
+import Input from './ui/Input';
+import Modal from './ui/Modal';
+import type { ModalHandle } from './ui/Modal';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -13,8 +17,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [username, setUsername] = useState(''); // Only for register
   const { login } = useAuth();
   const [error, setError] = useState('');
+  const modalRef = useRef<ModalHandle>(null);
 
-  if (!isOpen) return null;
+  // Handle modal open/close based on isOpen prop
+  if (isOpen && modalRef.current) {
+    modalRef.current.open();
+  } else if (!isOpen && modalRef.current) {
+    modalRef.current.close();
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,34 +53,58 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-96 border border-gray-700">
+    <Modal 
+      ref={modalRef} 
+      buttonCaption="Close" 
+      className="bg-custom-bg border border-white/20"
+      onClose={() => {
+        onClose();
+        // Reset form when modal closes
+        setEmail('');
+        setPassword('');
+        setUsername('');
+        setError('');
+      }}
+    >
+      <div className="w-96">
         <h2 className="text-2xl font-bold text-white mb-6">{isLogin ? 'Welcome Back' : 'Create Account'}</h2>
         
-        {error && <div className="bg-red-500/20 text-red-200 p-3 rounded mb-4 text-sm">{error}</div>}
+        {error && <div className="bg-red-500/20 text-white p-3 rounded-lg mb-4 text-sm">{error}</div>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <input 
-              type="text" placeholder="Username" 
-              className="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white"
-              value={username} onChange={e => setUsername(e.target.value)}
+            <Input 
+              type="text" 
+              label="Username"
+              placeholder="Enter username"
+              className="p-3 bg-custom-bg/80 border border-white/20 rounded-lg text-white"
+              value={username} 
+              onChange={(e: any) => setUsername(e.target.value)}
             />
           )}
-          <input 
-            type="email" placeholder="Email" 
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white"
-            value={email} onChange={e => setEmail(e.target.value)}
+          <Input 
+            type="email" 
+            label="Email"
+            placeholder="Enter email"
+            className="p-3 bg-custom-bg/80 border border-white/20 rounded-lg text-white"
+            value={email} 
+            onChange={(e: any) => setEmail(e.target.value)}
           />
-          <input 
-            type="password" placeholder="Password" 
-            className="w-full p-3 bg-gray-900 border border-gray-700 rounded text-white"
-            value={password} onChange={e => setPassword(e.target.value)}
+          <Input 
+            type="password" 
+            label="Password"
+            placeholder="Enter password"
+            className="p-3 bg-custom-bg/80 border border-white/20 rounded-lg text-white"
+            value={password} 
+            onChange={(e: any) => setPassword(e.target.value)}
           />
           
-          <button className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded transition">
+          <Button 
+            type="submit" 
+            className="w-full bg-indigo-600 hover:bg-indigo-500 py-3"
+          >
             {isLogin ? 'Login' : 'Sign Up'}
-          </button>
+          </Button>
         </form>
 
         <p className="mt-4 text-center text-gray-400 text-sm">
@@ -82,9 +116,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             {isLogin ? 'Sign Up' : 'Login'}
           </button>
         </p>
-        
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white">✕</button>
       </div>
-    </div>
+    </Modal>
   );
 }
