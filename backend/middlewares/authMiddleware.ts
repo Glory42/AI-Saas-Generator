@@ -1,8 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { type Request, type Response, type NextFunction} from 'express';
 import config from '../config/config.js';
+import { TokenService } from '../utils/tokenService.js';
 
-export default function authtoken(req: Request, res: Response, next: NextFunction) {
+export default async function authtoken(req: Request, res: Response, next: NextFunction) {
     const header = req.headers.authorization;
     if (!header) {
         return res.status(401).json({ message: 'Authorization header missing' });
@@ -23,6 +24,17 @@ export default function authtoken(req: Request, res: Response, next: NextFunctio
         // Validate required JWT properties exist
         if (!decoded.id || !decoded.email) {
             return res.status(401).json({ error: 'Invalid token: missing required fields' });
+        }
+
+        // Check if token is blacklisted
+        if (decoded.jti) {
+            const isBlacklisted = await TokenService.isAccessTokenBlacklisted(decoded.jti);
+            if (isBlacklisted) {
+                return res.status(401).json({ 
+                    error: 'Token has been revoked',
+                    code: 'TOKEN_REVOKED'
+                });
+            }
         }
 
         // Type-safe assignment with validation
