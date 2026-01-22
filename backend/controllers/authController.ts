@@ -5,6 +5,7 @@ import User from '../models/userModel.js';
 import config from '../config/config.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { apiError } from '../utils/apiError.js';
+import { AuditService } from '../utils/auditService.js';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
     const { email, password, username } = req.body;
@@ -28,6 +29,12 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
         config.JWT_TOKEN,
         { expiresIn: '1h' }
     );
+
+    const clientIP = req.ip || req.socket.remoteAddress;
+    await AuditService.log(freshUser.id, "USER_REGISTRATION", { 
+        email: freshUser.email, 
+        username: freshUser.username 
+    }, clientIP);
 
     res.status(201).json({ 
         message: 'User succesfully stored',
@@ -68,6 +75,11 @@ export const login = asyncHandler(async (req:Request, res: Response) => {
         config.JWT_TOKEN,
         { expiresIn: '1h' }
     );
+
+    const clientIP = req.ip || req.connection.remoteAddress;
+    await AuditService.log(user.id, "USER_LOGIN", { 
+        email: user.email 
+    }, clientIP);
 
     res.status(200).json({
         message: 'Login succefull',

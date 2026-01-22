@@ -5,7 +5,8 @@ import { AIService } from "../utils/aiService";
 import { StorageService } from "../utils/storageService"; 
 import { ImageModel } from "../models/imageModel";
 import { TEMPLATES, type TemplateId } from "../config/templates";
-import { type Request } from "express"; 
+import { type Request } from "express";
+import { AuditService } from "../utils/auditService"; 
 
 
 interface AuthRequest extends Request {
@@ -54,6 +55,13 @@ export const generateImage = asyncHandler(async (req: Request, res: Response) =>
         templateId, 
         selectedTemplate.systemPrompt
     );
+
+    const clientIP = req.ip || req.socket.remoteAddress;
+    await AuditService.log(userId, "IMAGE_GENERATED", { 
+        imageId, 
+        templateId, 
+        template: selectedTemplate.label 
+    }, clientIP);
 
     res.status(200).json({
         success: true,

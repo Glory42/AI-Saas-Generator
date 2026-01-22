@@ -3,6 +3,7 @@ import User from '../models/userModel.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { apiError } from '../utils/apiError.js';
 import { type UserRole } from '../types/User.js';
+import { AuditService } from '../utils/auditService.js';
 
 export const getUsers = asyncHandler(async (req: Request, res: Response) => {
     const users = await User.getUsers();
@@ -66,6 +67,12 @@ export const updateUserById = asyncHandler(async (req: Request, res: Response) =
         throw new apiError(404, 'User not found or update failed');
     }
 
+    const clientIP = req.ip || req.socket.remoteAddress;
+    await AuditService.log(req.user?.id || 'system', "USER_UPDATED", { 
+        targetUserId: id, 
+        updatedFields: Object.keys(updates) 
+    }, clientIP);
+
     res.status(200).json({
         message: 'User updated successfully',
         updatedUser,
@@ -84,6 +91,11 @@ export const updateUserProfile = asyncHandler(async (req: Request, res: Response
     }
 
     const updatedUser = await User.updateUser(loggedIn!, updates);
+
+    const clientIP = req.ip || req.socket.remoteAddress;
+    await AuditService.log(loggedIn!, "USER_PROFILE_UPDATED", { 
+        updatedFields: Object.keys(updates) 
+    }, clientIP);
 
     res.status(200).json({
         message: 'Profile updated successfully',
@@ -109,6 +121,13 @@ export const updatedUserRole = asyncHandler(async (req: Request, res: Response) 
         throw new apiError(404, 'User not found');
     }
 
+    const clientIP = req.ip || req.socket.remoteAddress;
+    await AuditService.log(req.user?.id || 'system', "USER_ROLE_UPDATED", { 
+        targetUserId: id, 
+        newRole: role, 
+        previousRole: updatedUser.role 
+    }, clientIP);
+
     res.status(200).json({
         message: `User role updated to ${role}`,
         user: {
@@ -130,10 +149,16 @@ export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
             throw new apiError(404, 'User not found or could not be deleted');
         }
 
-        await User.deleteUser(id);
+        const clientIP = req.ip || req.socket.remoteAddress;
+    await AuditService.log(req.user?.id || 'system', "USER_DELETED", { 
+        deletedUserId: id, 
+        deletedUserEmail: userExist.email 
+    }, clientIP);
 
-        res.status(200).json({
-            message: 'User deleted successfully',
-            userExist,
-        });
+    await User.deleteUser(id);
+
+    res.status(200).json({
+        message: 'User deleted successfully',
+        userExist,
+    });
 });
