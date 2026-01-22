@@ -12,7 +12,7 @@ const missingKeys = requiredEnvVars.filter((key) => !process.env[key]);
 
 if (missingKeys.length > 0) {
     console.error("CRITICAL ERROR: Missing environment variables:");
-    missingKeys.forEach((key) => { `  - ${key}` });
+    missingKeys.forEach((key) => { console.error(`  - ${key}`) });
     process.exit(1);
 }
 
