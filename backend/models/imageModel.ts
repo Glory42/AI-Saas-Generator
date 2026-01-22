@@ -26,13 +26,26 @@ export const ImageModel = {
         return data;
     },
         
-    async updateGenerated(id: string, generatedUrl: string, templateId: string, prompt: string) {
+    async updateGenerated(
+        id: string, 
+        generatedUrl: string, 
+        template: string, 
+        prompt: string,
+        cost: number = 0,
+        hash: string = "",
+        tier: string = "flash"
+    ) {
         const { data, error } = await supabase
         .from('images')
-        .update({ 
+        .update({
             generated_url: generatedUrl,
-            template: templateId,
-            prompt: prompt
+            template: template,
+            prompt: prompt,
+            status: 'completed',
+            generated_at: new Date(),
+            cost_usd: cost,
+            content_hash: hash,
+            model_tier: tier
         })
         .eq('id', id)
         .select()
