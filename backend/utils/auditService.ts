@@ -4,7 +4,7 @@ import env from "../config/config";
 const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_KEY);
 
 export const AuditService = {
-    async log(userId: string, action: string, details: any = {}, ip?: string) {
+    async log(userId: string | null, action: string, details: any = {}, ip?: string) {
         try {
         supabase.from("audit_logs").insert({
             user_id: userId,
