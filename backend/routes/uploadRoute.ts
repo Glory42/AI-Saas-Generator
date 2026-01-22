@@ -9,7 +9,6 @@ import userProtection from '../middlewares/userProtection.js';
 const router = Router();
 const storage = multer.memoryStorage();
 
-// Enhanced file upload configuration with security validations
 const upload = multer({ 
     storage: storage,
     limits: { 
@@ -17,7 +16,6 @@ const upload = multer({
         files: 1 // Single file only
     },
     fileFilter: (req, file, cb) => {
-        // Allowed file types
         const allowedTypes = /jpeg|jpg|png|gif|webp/;
         const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);

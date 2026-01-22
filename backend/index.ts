@@ -3,15 +3,15 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import config from './config/config.ts';
+import StartupService from './utils/startupService';
 import userRoutes from './routes/userRoute';
-import uploadRoutes from './routes/uploadRoute.ts';
+import uploadRoutes from './routes/uploadRoute';
 import generateRoutes from "./routes/generateRoute";
-import errorHandler from './middlewares/errorHandler.ts';
-import notFoundHandler from './middlewares/404handler.ts';
+import errorHandler from './middlewares/errorHandler';
+import notFoundHandler from './middlewares/404handler';
 
 const app = express();
 
-// Security middleware
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -23,16 +23,14 @@ app.use(helmet({
     },
 }));
 
-// Rate limiting middleware
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true, // Return rate limit info in headers
+    standardHeaders: true, 
     legacyHeaders: false,
 });
 
-// Upload-specific rate limiting
 const uploadLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hour
     max: 20, // 20 uploads per hour
@@ -56,6 +54,18 @@ app.use('/api/generate', generateRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-app.listen(config.port, () => {
-    console.log(`Server is running on http://localhost:${config.port}`);
-});
+const startServer = async () => {
+    try {
+        await StartupService.checkDatabaseConnection();
+        await StartupService.validateExternalKeys();
+
+        app.listen(config.port, () => {
+            console.log(`Server is running on http://localhost:${config.port}`);
+        });
+    } catch (error) {
+        console.error("Failed to start server: ", error);
+        process.exit(1);
+    }
+}
+
+startServer();

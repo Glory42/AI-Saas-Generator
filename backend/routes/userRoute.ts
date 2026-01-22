@@ -19,7 +19,6 @@ import authToken from '../middlewares/authMiddleware.js';
 
 const router = Router();
 
-// Auth-specific rate limiting
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 5, // 5 auth attempts per 15 minutes

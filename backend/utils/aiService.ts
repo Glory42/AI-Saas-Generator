@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import config from '../config/config';
+import env from '../config/config';
 
-const genAI = new GoogleGenerativeAI(config.GEMINI_API_KEY!);
+const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY!);
 
 export const AIService = {
     async generateImage(userPrompt: string, imageBuffer: Buffer, mimeType: string): Promise<Buffer> {
