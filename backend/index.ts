@@ -9,8 +9,11 @@ import uploadRoutes from './routes/uploadRoute';
 import generateRoutes from "./routes/generateRoute";
 import errorHandler from './middlewares/errorHandler';
 import notFoundHandler from './middlewares/404handler';
+import { generationLimiter } from './middlewares/rateLimiter';
 
 const app = express();
+
+app.set('trust proxy', 1);
 
 app.use(helmet({
     contentSecurityPolicy: {
@@ -49,7 +52,7 @@ app.use(express.json());
 
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadLimiter, uploadRoutes);
-app.use('/api/generate', generateRoutes);
+app.use('/api/generate', generationLimiter, generateRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
