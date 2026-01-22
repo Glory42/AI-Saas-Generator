@@ -16,6 +16,10 @@
   - Generates photorealistic product shots (8K, Cinematic Lighting).
 - **⚡ High Performance:** Built on **Bun** runtime for blazing fast execution.
 
+## 🗺️ Project Roadmap
+Curious about what's coming next? 
+[**Click here to view our detailed Roadmap & Master Plan**](./ROADMAP.md)
+
 ## Tech Stack
 
 - **Runtime:** [Bun](https://bun.sh/)
