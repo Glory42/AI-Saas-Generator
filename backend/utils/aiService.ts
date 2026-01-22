@@ -1,11 +1,17 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import sharp from 'sharp';
 import env from '../config/config';
 
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY!);
 
 export const AIService = {
-    async generateImage(userPrompt: string, imageBuffer: Buffer, mimeType: string): Promise<Buffer> {
-        
+    async generateImage(userPrompt: string, originalBuffer: Buffer, mimeType: string): Promise<Buffer> {
+        console.log("Optimizing image for AI analysis...");
+        const lowResBuffer = await sharp(originalBuffer)
+            .resize(512, 512, { fit: 'inside' })
+            .jpeg({ quality: 60 })
+            .toBuffer();
+
         try {
         console.log("🍌 Attempting Gemini 3.0 Pro Image Preview (Nano Banana Pro)...");
         
@@ -16,7 +22,7 @@ export const AIService = {
 
         const imagePart = {
             inlineData: {
-            data: imageBuffer.toString("base64"),
+            data: lowResBuffer.toString("base64"),
             mimeType: mimeType,
             },
         };
@@ -60,7 +66,7 @@ export const AIService = {
             enhancementPrompt,
             {
                 inlineData: {
-                    data: imageBuffer.toString("base64"),
+                    data: lowResBuffer.toString("base64"),
                     mimeType: mimeType
                 }
             }
