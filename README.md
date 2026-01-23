@@ -12,7 +12,7 @@
 - **☁️ Cloud Storage:** High-performance image uploads via Cloudinary.
 - **🧠 Smart Hybrid AI Engine:**
   - Attempts native **Gemini 3.0 Pro** image generation first.
-  - Automatically falls back to a **Gemini 3.0 (Brain)** pipeline if region-locked.
+  - Automatically falls back to a **High-Speed** Flash pipeline" or just "Gemini Flash".
   - Generates photorealistic product shots (8K, Cinematic Lighting).
 - **⚡ High Performance:** Built on **Bun** runtime for blazing fast execution.
 
@@ -41,7 +41,7 @@ Curious about what's coming next?
 
 1. **Clone the repository**
    ```bash
-   git clone [https://github.com/Glory42/ai-saas-generator.git](https://github.com/Glory42/ai-saas-generator.git)
+   git clone https://github.com/Glory42/ai-saas-generator.git
    cd ai-saas-generator
     ```
 
@@ -83,7 +83,7 @@ create table users (
   created_at timestamp with time zone default now()
 );
 
--- Images Table
+-- Images Table (Updated with cost & caching fields)
 create table images (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references users(id),
@@ -91,9 +91,17 @@ create table images (
   generated_url text,
   prompt text,
   template text,
+  status text default 'pending',            -- ✅ Added
+  model_tier text default 'flash',          -- ✅ Added
+  cost_usd decimal(10, 4) default 0,        -- ✅ Added
+  content_hash text,                        -- ✅ Added
+  generated_at timestamp with time zone,    -- ✅ Added
   created_at timestamp with time zone default now()
 );
-```
+
+-- Indexes for performance (Recommended)
+create index idx_images_user_id on images(user_id);
+create index idx_images_content_hash on images(content_hash);
 
 5. ***Run the Server***
 ```bash
