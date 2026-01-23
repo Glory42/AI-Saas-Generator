@@ -26,16 +26,16 @@ Curious about what's coming next?
 - **Backend:** Express, TypeScript
 - **Database:** Supabase 
 - **Storage:** Cloudinary
-- **AI Models:** Google Gemini 1.5/3.0 Pro
+- **AI Models:** Google Gemini 2.5/3.0 Pro
 - **Frontend:** React.js (In Progress)
 
 ##  Getting Started
 
 ### Prerequisites
 - [Bun](https://bun.sh/) installed (`curl -fsSL https://bun.sh/install | bash`)
-- A [Supabase](https://supabase.com/) project
-- A [Cloudinary](https://cloudinary.com/) account
-- A [Google AI Studio](https://aistudio.google.com/) API Key
+- [Supabase](https://supabase.com/) project
+- [Cloudinary](https://cloudinary.com/) account
+- [Google AI Studio](https://aistudio.google.com/) API Key
 
 ### Installation
 
@@ -103,19 +103,10 @@ create table images (
 ## API Endpoints 
 | Method | Endpoint | Description | Protected | 
 |-------|------------|-----------|----------|
-| `POST` | `/api/auth/register` | Create a new account | ❌ |
-| `POST` | `/api/auth/login` | Login and get JWT | ❌ |
+| `POST` | `/api/auth/register` | Create a new account | ✅ |
+| `POST` | `/api/auth/login` | Login and get JWT | ✅ |
 | `POST` | `/api/upload` | Upload an image file | ✅ |
 | `POST` | `/api/generate` | Generate AI transformation | ✅ |
-
-## Roadmap
-* [x] Backend Infrastructure (Auth, Uploads)
-
-* [x] AI Logic (Gemini 3.0 Integration)
-
-* [ ] Frontend Dashboard (React)
-
-* [ ] User Gallery & History
 
 ## License
 
