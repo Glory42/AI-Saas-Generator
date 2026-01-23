@@ -7,8 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        'custom-bg': '#313131',
-        'darkblue': '#1e3a8a',
+        'custom-bg': '#13074b',
         'stone-700': '#44403C',
         'stone-500': '#78716C',
       },
