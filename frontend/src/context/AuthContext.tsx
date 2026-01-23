@@ -1,24 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { apiClient } from '../services/apiClient';
 import { secureStorage } from '../utils/secureStorage';
-
-interface User {
-    id: string;
-    email: string;
-    username: string;
-    role: string;
-}
-
-interface AuthContextType {
-    user: User | null;
-    isLoading: boolean;
-    isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    register: (email: string, password: string, username: string) => Promise<void>;
-    logout: () => Promise<void>;
-    logoutAllDevices: () => Promise<void>;
-    updateUser: (updates: { username?: string; email?: string }) => Promise<void>;
-}
+import { type User, type AuthContextType, type UpdateProfileResponse } from '../types/contextTypes';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -103,10 +86,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updateUser = async (updates: { username?: string; email?: string }) => {
         setIsLoading(true);
         try {
-            const updatedUser = await apiClient.updateUserProfile(updates) as User; 
+            const response = await apiClient.updateUserProfile(updates) as UpdateProfileResponse;
             
-            setUser(updatedUser);
-            secureStorage.setItem('user', JSON.stringify(updatedUser));
+            const freshUser = response.updatedUser;
+
+            if (!freshUser || !freshUser.id) {
+                throw new Error("Invalid data received from server");
+            }
+
+            setUser(freshUser);
+            secureStorage.setItem('user', JSON.stringify(freshUser));
+            
         } catch (error) {
             throw error;
         } finally {
