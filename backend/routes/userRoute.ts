@@ -7,6 +7,8 @@ import {
     updateUserProfile,
     updatedUserRole,
     deleteUser,
+    getUserImages,
+    getUserStats,
 } from '../controllers/userController.js';
 import adminPrivilege from '../middlewares/adminPrivilege.js';
 import userProtection from '../middlewares/userProtection.js';
@@ -17,6 +19,8 @@ const router = Router();
 router.get('/', authToken, adminPrivilege, getUsers);
 router.put('/profile', authToken, userProtection, updateUserProfile);
 router.get('/profile', authToken, getUserProfile);
+router.get('/images', authToken, getUserImages);
+router.get('/stats', authToken, getUserStats);
 
 router.get('/:id', authToken, adminPrivilege, getUserById);
 router.put('/:id', authToken, adminPrivilege, updateUserById);
