@@ -1,6 +1,6 @@
 import { secureStorage } from '../utils/secureStorage';
 
-const API_BASE_URL = 'https://ai-saas-generator.onrender.com';
+const API_BASE_URL = 'https://ai-saas-generator.onrender.com/api';
 
 
 
