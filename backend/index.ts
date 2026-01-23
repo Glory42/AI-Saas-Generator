@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -8,6 +8,7 @@ import userRoutes from './routes/userRoute';
 import uploadRoutes from './routes/uploadRoute';
 import generateRoutes from "./routes/generateRoute";
 import authRoutes from './routes/authRoute';
+import templateRoutes from './routes/templateRoute';
 import errorHandler from './middlewares/errorHandler';
 import notFoundHandler from './middlewares/404handler';
 import { generationLimiter } from './middlewares/rateLimiter';
@@ -45,7 +46,7 @@ app.use(limiter);
 app.use(cors({
     origin: [
         "http://localhost:5173",
-        "https://ai-saas-generator.vercel.app",
+        "https://saas.gorkemkaryol.dev",
     ], 
     credentials: true
 }));
@@ -53,6 +54,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/templates', templateRoutes);
 app.use('/api/upload', uploadLimiter, uploadRoutes);
 app.use('/api/generate', generationLimiter, generateRoutes);
 
