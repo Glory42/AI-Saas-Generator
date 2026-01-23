@@ -1,23 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-
-export interface Toast {
-  id: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-  title: string;
-  message?: string;
-  duration?: number;
-}
-
-interface ErrorContextType {
-  toasts: Toast[];
-  addToast: (toast: Omit<Toast, 'id'>) => void;
-  removeToast: (id: string) => void;
-  clearToasts: () => void;
-  handleError: (error: unknown, fallbackMessage?: string) => void;
-  handleSuccess: (message: string, title?: string) => void;
-  handleWarning: (message: string, title?: string) => void;
-  handleInfo: (message: string, title?: string) => void;
-}
+import { type Toast, type ErrorContextType } from '../types/contextTypes';
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 

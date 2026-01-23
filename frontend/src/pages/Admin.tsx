@@ -3,25 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useError } from '../context/ErrorContext';
 import { apiClient } from '../services/apiClient';
+import { type User, type SystemStats } from '../types/pagesTypes';
 import Button from '../components/ui/Button';
 import Navigation from '../components/Navigation';
-
-interface User {
-    id: string;
-    email: string;
-    username: string;
-    role: string;
-    created_at: string;
-}
-
-interface SystemStats {
-    totalUsers: number;
-    adminUsers: number;
-    regularUsers: number;
-    totalImages: number;
-    totalGenerations: number;
-    totalCost: number;
-}
 
 export default function Admin() {
     const navigate = useNavigate();

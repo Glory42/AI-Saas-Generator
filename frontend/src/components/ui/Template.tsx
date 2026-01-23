@@ -1,12 +1,5 @@
 import Button from './Button';
-
-interface TemplateProps {
-    id: string;
-    label: string;
-    description: string;
-    isSelected: boolean;
-    onClick: () => void;
-}
+import { type TemplateProps } from '../../types/uiTypes';
 
 export default function Template({ id, label, description, isSelected, onClick }: TemplateProps) {
     void id; // Mark as used to avoid TypeScript warning

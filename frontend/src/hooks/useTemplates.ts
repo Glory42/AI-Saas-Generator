@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../services/apiClient';
-
-interface Template {
-    id: string;
-    label: string;
-    systemPrompt?: string;
-    modelTier: 'flash' | 'pro';
-}
+import { type Template } from '../types/hookTypes';
 
 interface UseTemplatesReturn {
     templates: Template[];

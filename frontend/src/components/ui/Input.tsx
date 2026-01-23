@@ -1,7 +1,6 @@
 import { forwardRef } from 'react';
 import type { InputHTMLAttributes, TextareaHTMLAttributes, ForwardRefRenderFunction } from 'react';
 
-
 interface InputProps {
     label: string;
     textarea?: boolean;

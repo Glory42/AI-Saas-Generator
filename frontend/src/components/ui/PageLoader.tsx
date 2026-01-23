@@ -1,11 +1,5 @@
-
 import LoadingSpinner from './LoadingSpinner';
-
-interface PageLoaderProps {
-    text?: string;
-    size?: 'sm' | 'md' | 'lg';
-    fullScreen?: boolean;
-}
+import { type PageLoaderProps } from '../../types/uiTypes';
 
 export default function PageLoader({ 
     text = 'Loading...', 

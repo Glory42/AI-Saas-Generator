@@ -1,19 +1,8 @@
 import { createPortal } from 'react-dom';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
-import type { ForwardRefRenderFunction, ReactNode } from 'react';
+import type { ForwardRefRenderFunction } from 'react';
 import Button from './Button';
-
-interface ModalProps {
-    children: ReactNode;
-    buttonCaption?: string;
-    className?: string;
-    onClose?: () => void;
-}
-
-interface ModalHandle {
-    open: () => void;
-    close: () => void;
-}
+import { type ModalProps, type ModalHandle } from '../../types/uiTypes';
 
 const Modal: ForwardRefRenderFunction<ModalHandle, ModalProps> = 
     function Modal({ children, buttonCaption = "Close", className = "", onClose }, ref) {

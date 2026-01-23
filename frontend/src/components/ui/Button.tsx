@@ -1,11 +1,5 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { type ButtonProps } from '../../types/uiTypes';
 import LoadingSpinner from './LoadingSpinner';
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
-  className?: string;
-  loading?: boolean;
-}
 
 export default function Button({ children, className = "", loading = false, ...props }: ButtonProps) {
   return (

@@ -3,21 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { useError } from '../context/ErrorContext';
 import { apiClient } from '../services/apiClient';
 import { useTemplates } from '../hooks/useTemplates';
+import { type ImageResult } from '../types/pagesTypes';
 import Button from '../components/ui/Button';
 import Template from '../components/ui/Template';
 import Navigation from '../components/Navigation';
 
-interface ImageResult {
-    id: string;
-    original_url: string;
-    generated_url: string;
-    cost_usd: number;
-    model_tier: string;
-    template: string;
-    status: string;
-    created_at: string;
-    generated_at: string;
-}
 
 export default function Dashboard() {
     const { } = useAuth();

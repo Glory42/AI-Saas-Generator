@@ -1,20 +1,6 @@
 import { secureStorage } from '../utils/secureStorage';
-
+import { type AuthResponse } from '../types/servicesTypes.ts';
 const API_BASE_URL = 'https://ai-saas-generator.onrender.com/api';
-
-
-
-interface AuthResponse {
-    user: {
-        id: string;
-        email: string;
-        username: string;
-        role: string;
-    };
-    token: string;
-    refreshToken: string;
-    message?: string;
-}
 
 class ApiClient {
     private accessToken: string | null = null;
