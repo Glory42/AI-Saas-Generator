@@ -103,7 +103,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const updateUser = async (updates: { username?: string; email?: string }) => {
         setIsLoading(true);
         try {
-            const updatedUser = await apiClient.updateUserProfile(updates);
+            const updatedUser = await apiClient.updateUserProfile(updates) as User; 
+            
             setUser(updatedUser);
             secureStorage.setItem('user', JSON.stringify(updatedUser));
         } catch (error) {
