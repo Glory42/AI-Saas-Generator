@@ -102,6 +102,7 @@ create table images (
 -- Indexes for performance (Recommended)
 create index idx_images_user_id on images(user_id);
 create index idx_images_content_hash on images(content_hash);
+```
 
 5. ***Run the Server***
 ```bash
