@@ -16,7 +16,7 @@ export interface SystemStats {
 }
 
 export interface ImageResult {
-    id: string;
+    id: string | number;
     original_url: string;
     generated_url: string;
     cost_usd: number;
@@ -29,7 +29,7 @@ export interface ImageResult {
 
 
 export interface ImageRecord {
-    id: string;
+    id: string | number;
     original_url: string;
     generated_url?: string;
     template?: string;
