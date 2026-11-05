@@ -1,0 +1,24 @@
+import pino from "pino";
+import { env } from "../../infrastructure/config/env";
+
+const isProduction = env.NODE_ENV === "production";
+
+export const logger = pino({
+  level: env.NODE_ENV === "test" ? "silent" : isProduction ? "info" : "debug",
+  redact: {
+    paths: [
+      "req.headers.authorization",
+      "req.headers.cookie",
+      "res.headers['set-cookie']",
+    ],
+    remove: true,
+  },
+  ...(isProduction || env.NODE_ENV === "test"
+    ? {}
+    : {
+        transport: {
+          target: "pino-pretty",
+          options: { colorize: true, ignore: "pid,hostname", translateTime: "HH:MM:ss" },
+        },
+      }),
+});

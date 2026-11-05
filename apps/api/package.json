@@ -1,0 +1,52 @@
+{
+  "name": "@aisg/api",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:arch": "bun run scripts/architecture-check.ts",
+    "test": "bun run test:unit && bun run test:integration",
+    "test:unit": "bun --no-env-file test tests/unit",
+    "test:integration": "bun --no-env-file test tests/integration --preload ./tests/integration/setup/preload.ts --timeout 20000",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "bun run scripts/migrate.ts"
+  },
+  "dependencies": {
+    "@google/genai": "^2.32.0",
+    "cloudinary": "^2.11.0",
+    "cors": "^2.8.6",
+    "drizzle-orm": "^0.45.4",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.3",
+    "helmet": "^8.3.0",
+    "jose": "^6.2.15",
+    "multer": "^2.5.0",
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "pino-http": "^11.0.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/bun": "^1.4.4",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.6",
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^10.14.0",
+    "globals": "^17.14.0",
+    "pino-pretty": "^13.2.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.72.1"
+  },
+  "overrides": {
+    "typescript": "~5.9.3"
+  }
+}
