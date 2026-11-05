@@ -30,7 +30,7 @@ Copy `.env.example` to `.env`.
 | `VITE_API_BASE_URL` | empty | API origin in production; empty in dev so the Vite proxy handles `/api` |
 | `VITE_API_PROXY_TARGET` | `http://localhost:5000` | Where the dev server proxies `/api` |
 
-`.env.production` points `VITE_API_BASE_URL` at the deployed API.
+Set `VITE_API_BASE_URL` in `.env.production` (or inline at build time) to point a production build at your own API; see `DEPLOYMENT.md`.
 
 ## Layout
 

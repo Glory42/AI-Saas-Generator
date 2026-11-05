@@ -18,8 +18,8 @@ allow-list (the same list CORS uses), and cookies are `SameSite=Lax` in developm
 ## Consequences
 
 - The web app never sees a token; "am I signed in?" is `GET /api/auth/session`.
-- Safari's ITP blocks third-party cookies, so production should serve the API from a subdomain of
-  the web app's domain (e.g. `api.saas.gorkemkaryol.dev`) to keep cookies first-party.
+- Safari's ITP blocks third-party cookies, so a deployment should serve the API from the same site
+  as the web app (e.g. `app.example.com` and `api.example.com`) to keep cookies first-party.
 - A rotated refresh token keeps authenticating requests for 20 seconds (`ROTATION_GRACE_MS`).
   Without it, a page that fires several requests right after the access cookie expires would see
   one request win the rotation and the rest fail with 401, signing the user out. The explicit

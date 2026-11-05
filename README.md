@@ -1,7 +1,11 @@
-# [AI SaaS Generator](https://saas.gorkemkaryol.dev)
+# AI SaaS Generator
 
 Turn ordinary product photos into marketing-ready shots. Upload a photo, pick a style, and get an
 AI-rendered result you can download and revisit later.
+
+> There is no hosted demo. Clone the repo and run it locally in a few minutes, with no API keys
+> needed (see [Quick start](#quick-start)), or deploy your own instance with
+> [DEPLOYMENT.md](DEPLOYMENT.md).
 
 - **Tiered AI pipeline:** each style runs on a `flash` or `pro` Gemini image model. If that fails, a
   hybrid fallback has Gemini write a detailed prompt for an external renderer.
@@ -42,7 +46,7 @@ AI-rendered result you can download and revisit later.
 ├── docs/api.md        # HTTP contract (every endpoint, shape and error code)
 ├── docs/adr/          # Architecture decision records
 ├── CONTEXT.md         # Domain glossary (Image, Generation, Template, Strategy, Cache hit…)
-├── DEPLOYMENT.md      # Supabase + Render + Cloudinary setup
+├── DEPLOYMENT.md      # Self-hosting guide (Supabase, Docker, Cloudinary)
 └── docker-compose.yml # Local Postgres standing in for Supabase
 ```
 
@@ -88,6 +92,13 @@ cp apps/web/.env.example apps/web/.env
 (cd apps/api && bun run db:migrate)
 
 bun run dev                                   # API on :5000, web on :5173
+```
+
+Open http://localhost:5173 and create an account. To see the admin console, promote yourself:
+
+```bash
+docker compose exec postgres psql -U aisg -d aisg \
+  -c "update users set role = 'admin' where email = 'you@example.com';"
 ```
 
 No Gemini or Cloudinary account is needed to try it locally. Without keys, the API renders with a

@@ -6,7 +6,7 @@ schema only as SQL snippets in the README. It also used the anon key server-side
 had no row-level security, so anyone holding that key could query `users` (password hashes
 included) straight through Supabase's REST API.
 
-Supabase stays the production database. The API connects to it over the Postgres wire protocol
+Supabase stays the intended production database. The API connects to it over the Postgres wire protocol
 with Drizzle ORM and `pg`, using the project's pooled connection string as `DATABASE_URL`. The
 schema lives in `*.entity.ts` files next to their modules, migrations are generated into
 `apps/api/drizzle/`, and query results are typed from the schema. A migration enables RLS on every
@@ -18,5 +18,5 @@ roles that PostgREST uses see nothing.
 - Local dev and CI run against a plain `postgres:16` container (`docker compose up -d postgres`)
   that stands in for Supabase; the same migrations apply to both.
 - No Supabase keys are needed by the API at all, only the connection string.
-- Existing production data in the old tables needs a one-off copy into the new schema; the old
-  `token_blacklist`, `account_lockouts` and `refresh_tokens` tables are not carried over.
+- The schema starts fresh: the first version's `token_blacklist`, `account_lockouts` and
+  `refresh_tokens` tables have no equivalent, and its `images` table is split in two (ADR 0002).
