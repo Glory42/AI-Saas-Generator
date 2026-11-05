@@ -1,51 +1,69 @@
 # Contributing to AI SaaS Generator
 
-First off, thanks for taking the time to contribute! 🎉
+Thanks for taking the time to contribute. This guide covers setup, conventions and how to submit
+changes. For architecture details, read [`CLAUDE.md`](CLAUDE.md); for domain terms,
+[`CONTEXT.md`](CONTEXT.md); for the HTTP contract, [`docs/api.md`](docs/api.md).
 
-We welcome contributions from everyone. Whether you're fixing a bug, improving documentation, or adding a new feature, your help is appreciated.
+## Setup
 
-## Development Workflow
+```bash
+bun run install:all
+docker compose up -d postgres
+cp apps/api/.env.example apps/api/.env   # set JWT_ACCESS_SECRET
+(cd apps/api && bun run db:migrate)
+bun run dev
+```
 
-1.  **Fork the repository** to your own GitHub account.
-2.  **Clone the project** to your machine.
-3.  **Create a branch** for your fix or feature:
-    ```bash
-    git checkout -b feat/amazing-new-feature
-    # or
-    git checkout -b fix/annoying-bug
-    ```
-4.  **Make your changes** and test them locally.
-5.  **Commit your changes** using descriptive commit messages (Conventional Commits preferred):
-    ```bash
-    git commit -m "feat: add support for dark mode"
-    ```
-6.  **Push to your branch**:
-    ```bash
-    git push origin feat/amazing-new-feature
-    ```
-7.  **Open a Pull Request** (PR) on the main repository.
+You don't need any third-party account: without keys the API uses the local-preview AI strategy
+and local disk storage.
 
-## Code Style & Standards
+## Workflow
 
-- **Runtime:** We use [Bun](https://bun.sh/). Please do not use `npm` or `yarn` lockfiles.
-- **TypeScript:** Stick to strict typing where possible. Avoid `any` unless absolutely necessary (e.g., experimental AI SDK features).
-- **Formatting:** Code should be clean and readable. 
+1. Open or pick a GitHub issue.
+2. Branch from `master`: `feat/<short-name>`, `fix/<short-name>` or `refactor/<short-name>`.
+3. Commit with [Conventional Commits](https://www.conventionalcommits.org) scoped to the area:
+   `feat(images): …`, `fix(web): …`, `docs(adr): …`.
+4. Run the checks below, then open a pull request that links the issue.
 
-## Testing
+## Conventions
 
-Before submitting a PR, please ensure:
-- The server starts without errors (`bun run dev`).
-- The basic flows (Auth -> Upload -> Generate) work as expected.
+- **Bun only.** Don't add npm or yarn lockfiles.
+- **Types:**
+  - Strict TypeScript; no `any`, `@ts-ignore` or non-null `!` on external data.
+  - Parse request bodies, env and API responses with Zod.
+- **Backend layering:**
+  - Follow `routes → controller → service → repository` (`bun run lint:arch` enforces it).
+  - Pure rules go in `policies/` with unit tests.
+  - Throw `AppError` subclasses; never `res.status(...)` from a service.
+- **Database:**
+  - Edit the `*.entity.ts` file, then run `bun run db:generate`.
+  - Index every column used in `WHERE`/`JOIN`, and keep RLS enabled on new tables (the
+    integration suite checks).
+- **Frontend:**
+  - Feature folders with `api.ts` + `hooks/` + `components/` + `pages/`.
+  - Thin route files; `apiRequest()` only; narrow query invalidation; design tokens instead of hex
+    colors.
+- **Comments:** one line each, explaining *why*.
+- **Docs:** update `docs/api.md` for any endpoint change, and add an ADR in `docs/adr/` for any
+  decision a future contributor might question.
 
-## Reporting Bugs
+## Checks
 
-If you find a bug, please create an issue including:
-- Steps to reproduce.
-- Expected vs. actual behavior.
-- Screenshots or log snippets if applicable.
+```bash
+bun run typecheck
+bun run lint
+bun run test
+bun run test:integration   # needs the local Postgres
+```
+
+CI runs the same commands. The pre-commit hook runs the lint checks for whichever app has staged
+changes.
+
+## Reporting bugs
+
+Open an issue with steps to reproduce, expected vs. actual behavior, and the `x-request-id`
+response header if an API call failed: it matches the server log line.
 
 ## Contact
 
-If you have any questions, feel free to reach out to me at `me@gorkemkaryol.dev`.
-
-Happy Coding! 🚀
+Questions? Reach me at `me@gorkemkaryol.dev`.

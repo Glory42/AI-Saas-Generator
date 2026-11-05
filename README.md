@@ -1,127 +1,148 @@
-# AI SaaS Image Generator
+# [AI SaaS Generator](https://saas.gorkemkaryol.dev)
 
-> A full-stack AI platform that transforms ordinary product photos into professional marketing assets using a Smart Hybrid AI Engine.
+Turn ordinary product photos into marketing-ready shots. Upload a photo, pick a style, and get an
+AI-rendered result you can download and revisit later.
 
-![Project Status](https://img.shields.io/badge/status-in%20development-orange)
-![Tech Stack](https://img.shields.io/badge/stack-Bun%20%2B%20Express%20%2B%20React-blue)
-![License](https://img.shields.io/badge/license-GPL-green)
+- **Tiered AI pipeline:** each style runs on a `flash` or `pro` Gemini image model. If that fails, a
+  hybrid fallback has Gemini write a detailed prompt for an external renderer.
+- **Content-addressed cache:** re-rendering the same photo with the same style costs nothing and
+  returns instantly.
+- **Quotas and cost tracking:** a rolling 24-hour generation quota per user, with an estimated cost
+  recorded on every generation.
+- **Gallery:** every photo keeps all its renders, including failed attempts.
+- **Admin console:** system stats, user management and an audit log of security-relevant actions.
+- **Hardened auth:**
+  - `httpOnly` cookie sessions with rotating refresh tokens
+  - argon2id password hashing
+  - login lockout and a trusted-origin check on mutations
 
-## Features
+## Tech stack
 
-- **🔐 Secure Authentication:** JWT-based auth with Supabase (Users, Roles).
-- **☁️ Cloud Storage:** High-performance image uploads via Cloudinary.
-- **🧠 Smart Hybrid AI Engine:**
-  - Attempts native **Gemini 3.0 Pro** image generation first.
-  - Automatically falls back to a **High-Speed** Flash pipeline" or just "Gemini Flash".
-  - Generates photorealistic product shots (8K, Cinematic Lighting).
-- **⚡ High Performance:** Built on **Bun** runtime for blazing fast execution.
+| Layer | Tech |
+| --- | --- |
+| Runtime | Bun |
+| Backend | Express 5 + TypeScript, Zod, pino |
+| Database | Supabase (PostgreSQL), with row-level security on every table |
+| ORM | Drizzle ORM + drizzle-kit migrations |
+| Auth | In-house: JWT access cookie (`jose`) + rotating refresh sessions, argon2id via `Bun.password` |
+| AI | Google Gemini (`@google/genai`) with image-model tiers and a hybrid fallback |
+| Storage | Cloudinary, or local disk in development |
+| Frontend | React 19 + Vite |
+| Routing / data | TanStack Router (file-based) + TanStack Query |
+| UI | Tailwind CSS v4, lucide icons |
+| Testing | `bun test` (unit + HTTP integration against Postgres), Vitest + Testing Library |
+| Tooling | ESLint, an architecture-boundary check, Husky + lint-staged, GitHub Actions, Docker |
 
-## 🗺️ Project Roadmap
-Curious about what's coming next? 
-[**Click here to view our detailed Roadmap & Master Plan**](./ROADMAP.md)
+## Repository layout
 
-## Tech Stack
+```text
+.
+├── apps/api/          # Express API: domain modules, Drizzle schema + migrations, AI/storage providers
+├── apps/web/          # React SPA: TanStack Router routes, feature folders, UI primitives
+├── docs/api.md        # HTTP contract (every endpoint, shape and error code)
+├── docs/adr/          # Architecture decision records
+├── CONTEXT.md         # Domain glossary (Image, Generation, Template, Strategy, Cache hit…)
+├── DEPLOYMENT.md      # Supabase + Render + Cloudinary setup
+└── docker-compose.yml # Local Postgres standing in for Supabase
+```
 
-- **Runtime:** [Bun](https://bun.sh/)
-- **Backend:** Express, TypeScript
-- **Database:** Supabase 
-- **Storage:** Cloudinary
-- **AI Models:** Google Gemini 2.5/3.0 Pro
-- **Frontend:** React.js (In Progress)
+## Architecture
 
-##  Getting Started
+```text
+Browser ─▶ React SPA (TanStack Router + Query)
+             │  fetch, credentials: include
+             ▼
+Express 5 on Bun ─ helmet · CORS allow-list · trusted-origin · rate limits · pino-http
+             │
+        requireAuth (JWT access cookie, transparent refresh)
+             │
+   routes ─▶ controller ─▶ service ─▶ repository ─▶ Drizzle ─▶ Supabase Postgres
+                              │
+                              ├─▶ infrastructure/ai       gemini-image ▸ hybrid ▸ (local-preview)
+                              └─▶ infrastructure/storage  cloudinary ▸ (local disk)
+```
 
-### Prerequisites
-- [Bun](https://bun.sh/) installed (`curl -fsSL https://bun.sh/install | bash`)
-- [Supabase](https://supabase.com/) project
-- [Cloudinary](https://cloudinary.com/) account
-- [Google AI Studio](https://aistudio.google.com/) API Key
+Every backend module has the same layers (`routes → controller → service → repository`, Zod DTOs,
+pure `policies/`). `bun run lint:arch` enforces the boundaries. The generation flow is:
 
-### Installation
+1. Load the image (owner-only).
+2. Resolve the template and check the daily quota.
+3. Look up the per-user cache by `sha256(contentHash, template, promptVersion, tier)`.
+4. On a miss, record a `pending` generation and run the strategy chain.
+5. Store the result and mark it `completed` or `failed`.
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Glory42/ai-saas-generator.git
-   cd ai-saas-generator
-    ```
+See [`docs/adr/`](docs/adr) for why things are the way they are.
 
-2. **Install Dependencies**
+## Quick start
+
+Prerequisites: Bun 1.3+ and Docker.
+
 ```bash
-    cd server
-    bun install
+git clone https://github.com/Glory42/ai-saas-generator.git
+cd ai-saas-generator
+bun run install:all
+
+docker compose up -d postgres                 # local Postgres on :5433
+cp apps/api/.env.example apps/api/.env        # then set JWT_ACCESS_SECRET (openssl rand -base64 48)
+cp apps/web/.env.example apps/web/.env
+(cd apps/api && bun run db:migrate)
+
+bun run dev                                   # API on :5000, web on :5173
 ```
 
-3. **Environment Setup Create a .env file in the server directory:**
-```toml
-    PORT=5000
+No Gemini or Cloudinary account is needed to try it locally. Without keys, the API renders with a
+deterministic local filter per template and stores files on disk. Add `GEMINI_API_KEY` and the
+`CLOUDINARY_*` variables to `apps/api/.env` to use the real services.
 
-    # Database
-    SUPABASE_URL=your_supabase_url
-    SUPABASE_KEY=your_supabase_anon_key
+## Templates
 
-    # Auth
-    JWT_TOKEN=your_super_secret_jwt_key
+| Template | Tier |
+| --- | --- |
+| E-Commerce Clean | flash |
+| Minimal Flat Lay | flash |
+| Holiday Festive | flash |
+| Instagram Promo | pro |
+| Lifestyle Outdoor | pro |
+| Luxury Dark | pro |
 
-    # Storage
-    CLOUDINARY_CLOUD_NAME=your_cloud_name
-    CLOUDINARY_API_KEY=your_api_key
-    CLOUDINARY_API_SECRET=your_api_secret
+Templates live in `apps/api/src/modules/templates/constants`. Their prompts never leave the server.
+Bumping a template's `promptVersion` invalidates its cached results.
 
-    # AI
-    GEMINI_API_KEY=your_google_gemini_key
-```
+## API
 
-4. **Database Schema Run these SQL queries in your Supabase SQL Editor to set up the tables:**
-```sql
--- Users Table
-create table users (
-  id uuid default gen_random_uuid() primary key,
-  email text unique not null,
-  password text not null,
-  username text not null,
-  role text default 'user',
-  created_at timestamp with time zone default now()
-);
+The full contract is in [`docs/api.md`](docs/api.md). In short:
 
--- Images Table (Updated with cost & caching fields)
-create table images (
-  id uuid default gen_random_uuid() primary key,
-  user_id uuid references users(id),
-  original_url text not null,
-  generated_url text,
-  prompt text,
-  template text,
-  status text default 'pending',            -- ✅ Added
-  model_tier text default 'flash',          -- ✅ Added
-  cost_usd decimal(10, 4) default 0,        -- ✅ Added
-  content_hash text,                        -- ✅ Added
-  generated_at timestamp with time zone,    -- ✅ Added
-  created_at timestamp with time zone default now()
-);
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| `POST` | `/api/auth/register` · `/login` · `/logout` · `/logout-all` | Cookie sessions |
+| `GET` | `/api/auth/session` | Current user or `null` |
+| `PATCH` `POST` `DELETE` | `/api/users/me` · `/me/password` | Profile, password, account deletion |
+| `GET` | `/api/users/me/stats` | Usage, cost and quota |
+| `GET` | `/api/templates` | Available styles |
+| `POST` `GET` | `/api/images` | Upload (multipart) / list with generations (cursor-paginated) |
+| `GET` `DELETE` | `/api/images/:id` | One image with all its generations |
+| `POST` | `/api/images/:id/generations` | Render an image with a template |
+| `GET` `PATCH` `DELETE` | `/api/admin/*` | Stats, users, roles, audit log (admin only) |
 
--- Indexes for performance (Recommended)
-create index idx_images_user_id on images(user_id);
-create index idx_images_content_hash on images(content_hash);
-```
+## Quality checks
 
-5. ***Run the Server***
 ```bash
-    bun run dev
+bun run typecheck         # both apps
+bun run lint              # ESLint + architecture boundaries
+bun run test              # API unit tests + web tests
+bun run test:integration  # API HTTP tests against the local Postgres
 ```
 
-## API Endpoints 
-| Method | Endpoint | Description | Protected | 
-|-------|------------|-----------|----------|
-| `POST` | `/api/auth/register` | Create a new account | ✅ |
-| `POST` | `/api/auth/login` | Login and get JWT | ✅ |
-| `POST` | `/api/upload` | Upload an image file | ✅ |
-| `POST` | `/api/generate` | Generate AI transformation | ✅ |
+CI runs all of the above on every pull request ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md).
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0.  
-See the [LICENSE](LICENSE) file for more information.
+GNU General Public License v3.0. See [LICENSE](LICENSE).
 
 ## Contact
 
-If you have any questions, feel free to reach out to me at `me@gorkemkaryol.dev`.
+Questions? Reach me at `me@gorkemkaryol.dev`.
