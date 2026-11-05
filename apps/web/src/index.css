@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, monospace;
+
+  /* Deep-indigo identity carried over from the first version (#13074b). */
+  --color-background: #0e0638;
+  --color-foreground: #f4f1ff;
+  --color-card: #170b4f;
+  --color-card-foreground: #f4f1ff;
+  --color-muted: #21135f;
+  --color-muted-foreground: #a99fd6;
+  --color-border: #2e1f73;
+  --color-input: #2e1f73;
+  --color-primary: #8b5cf6;
+  --color-primary-foreground: #ffffff;
+  --color-accent: #22d3ee;
+  --color-accent-foreground: #04222a;
+  --color-destructive: #f43f5e;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-ring: #a78bfa;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 0.875rem;
+  --radius-xl: 1.25rem;
+
+  --animate-fade-up: fade-up 0.35s ease-out both;
+  --animate-toast-in: toast-in 0.25s ease-out both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply min-h-screen bg-background font-sans text-foreground antialiased;
+    background-image:
+      radial-gradient(60rem 40rem at 10% -10%, color-mix(in oklab, var(--color-primary) 22%, transparent), transparent 70%),
+      radial-gradient(50rem 30rem at 110% 10%, color-mix(in oklab, var(--color-accent) 10%, transparent), transparent 70%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--color-primary) 60%, transparent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+  }
+}
