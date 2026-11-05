@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  web:
+    name: Web
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        working-directory: apps/web
+
+      - name: Typecheck
+        run: bun run typecheck
+        working-directory: apps/web
+
+      - name: Lint
+        run: bun run lint
+        working-directory: apps/web
+
+      - name: Test
+        run: bun run test
+        working-directory: apps/web
+
+      - name: Build
+        run: bun run build
+        working-directory: apps/web
+
+  api:
+    name: API
+    runs-on: ubuntu-latest
+
+    # Stands in for Supabase Postgres; tests must never touch the real project.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: aisg
+          POSTGRES_PASSWORD: aisg
+          POSTGRES_DB: aisg_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U aisg -d aisg_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      TEST_DATABASE_URL: postgres://aisg:aisg@localhost:5433/aisg_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+        working-directory: apps/api
+
+      - name: Typecheck
+        run: bun run typecheck
+        working-directory: apps/api
+
+      - name: Lint
+        run: bun run lint
+        working-directory: apps/api
+
+      - name: Architecture check
+        run: bun run lint:arch
+        working-directory: apps/api
+
+      - name: Unit tests
+        run: bun run test:unit
+        working-directory: apps/api
+
+      - name: Integration tests
+        run: bun run test:integration
+        working-directory: apps/api

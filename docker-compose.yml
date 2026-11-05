@@ -1,0 +1,23 @@
+# Local stand-in for Supabase Postgres (dev + tests). Production uses the Supabase project.
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: aisg
+      POSTGRES_PASSWORD: aisg
+      POSTGRES_DB: aisg
+    # 5433 on the host so it can run next to another project's Postgres on 5432.
+    ports:
+      - "5433:5432"
+    volumes:
+      - aisg-postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aisg -d aisg"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  aisg-postgres-data:
