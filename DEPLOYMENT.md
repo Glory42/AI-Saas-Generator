@@ -1,9 +1,25 @@
 # Self-hosting
 
-There is no hosted instance of this project. This guide covers running your own. The intended
-setup is **Supabase** for Postgres, any Docker host for the API (Render, Fly.io, Railway, a VPS…),
-**Cloudinary** for image files, and any static host for the web app. The examples below use
-`https://app.example.com` for the web app and `https://api.example.com` for the API.
+The original deployment used:
+
+- **Supabase** for Postgres
+- **Render** for the API's Docker container
+- **Cloudinary** for image files
+- a static host for the web app
+
+That deployment and those accounts have been shut down, so there is no live instance. This guide
+sets up your own copy. You can repeat the original setup on your own accounts, or swap any piece
+for an alternative:
+
+| Piece | Original | Alternatives |
+| --- | --- | --- |
+| Database | Supabase | Any Postgres 16: Neon, Railway, RDS, your own Docker container |
+| API | Render | Any Docker host: Fly.io, Railway, Koyeb, a VPS |
+| Image files | Cloudinary | None built in; add a `StorageProvider` (ADR 0004) for S3 or R2 |
+| Web app | Static host | Vercel, Netlify, Cloudflare Pages, any static file server |
+
+The examples below use `https://app.example.com` for the web app and `https://api.example.com`
+for the API.
 
 ## 1. Supabase
 

@@ -3,9 +3,11 @@
 Turn ordinary product photos into marketing-ready shots. Upload a photo, pick a style, and get an
 AI-rendered result you can download and revisit later.
 
-> There is no hosted demo. Clone the repo and run it locally in a few minutes, with no API keys
-> needed (see [Quick start](#quick-start)), or deploy your own instance with
-> [DEPLOYMENT.md](DEPLOYMENT.md).
+> **Status:** this project used to run live, with the database on Supabase and the API on Render.
+> That deployment has been shut down, so there is no hosted demo. The code is complete, though:
+> clone it and run it locally in a few minutes with no API keys (see [Quick start](#quick-start)).
+> Or deploy your own copy on the same services or any alternatives (see
+> [DEPLOYMENT.md](DEPLOYMENT.md)).
 
 - **Tiered AI pipeline:** each style runs on a `flash` or `pro` Gemini image model. If that fails, a
   hybrid fallback has Gemini write a detailed prompt for an external renderer.
